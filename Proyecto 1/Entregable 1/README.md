@@ -21,7 +21,7 @@ El documento correspondiente al punto A presenta un diagrama de los conceptos in
 
 El documento relacionado al punto B presenta un análisis de las estructuras de datos finales consideradas más adecuadas para almacenar la información del archivo.
 
-📄 **Documento:** `Entregable1_b_estructura_datos.pdf`
+**Documento:** `Entregable1_b_estructura_datos.pdf`
 
 ## Estructura del repositorio
 
