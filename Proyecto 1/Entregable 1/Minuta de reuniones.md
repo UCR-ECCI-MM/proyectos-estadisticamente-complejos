@@ -17,5 +17,11 @@ Con el objetivo de generar el PDF final, cad integrante del grupo escribió la s
 
 Se generó el diagrama solicitado en el punto b del entregable 1 usando Claude Code.
 
+## Dia de la reunion: 18-08-2026
+
+Durante la reunión se realizó una revisión grupal del trabajo escrito correspondiente al entregable 1, con el objetivo de verificar que cada uno de los puntos solicitados estuviera completo, correctamente explicado y fuera coherente con los requerimientos del proyecto. Además, se revisaron en conjunto las estructuras de datos propuestas para cada funcionalidad y el diagrama generado.
+
+Posteriormente, se realizó una práctica grupal de la presentación del entregable. Cada integrante explicó la parte que tenía asignada, con el fin de prepararse para la exposición.
+
 
 
