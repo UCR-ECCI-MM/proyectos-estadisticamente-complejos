@@ -29,7 +29,7 @@ tokens = (
 
 t_TABLE_DUMP2 = r'TABLE_DUMP2'
 t_PIPE = r'\|'
-t_STATE = r'[BAW]'
+t_STATE = r'[BAW]{1}'
 t_LBRACE = r'\{'
 t_RBRACE = r'\}'
 t_COMMA = r','
