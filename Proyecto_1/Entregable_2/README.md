@@ -28,15 +28,15 @@ Posteriormente, se distribuyó entre los integrantes del equipo la implementaci�
 
 La distribución realizada fue la siguiente:
 
-| Elemento             | Integrante |       |
-| -------------------- | ---------- | ----- |
-| `TABLE_DUMP2`        | Alison     |       |
-| Timestamp            | Brandon    |       |
-| State                | Sebas      |       |
-| Fragmento de IP      | Alison     |       |
-| Dígito               | Brandon    |       |
-| Salto de línea       | Alison     |       |
-| Longitud del prefijo | Sebas      |       |
+| Elemento             | Integrante |
+| -------------------- | ---------- |
+| `TABLE_DUMP2`        | Alison     |       
+| Timestamp            | Brandon    |       
+| State                | Sebas      |       
+| Fragmento de IP      | Alison     |       
+| Dígito               | Brandon    |       
+| Salto de línea       | Alison     |       
+| Longitud del prefijo | Sebas      |       
 
 Después de integrar las diferentes partes desarrolladas por el equipo, se construyó el lexer utilizado para procesar los archivos completos.
 
