@@ -12,7 +12,7 @@ tokens = (
     'SPACE'
 )
 
-t_STATE    = r'[A|B|W]{1}'
+t_STATE    = r'[ABW]{1}'
 t_LINE   = r'\|'
 t_SPACE = r'\s'
 t_ASPATH = r'\d{1,10}(\s+\d{1,10})*'

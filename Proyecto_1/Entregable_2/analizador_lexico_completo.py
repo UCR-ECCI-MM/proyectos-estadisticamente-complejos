@@ -33,7 +33,7 @@ t_STATE = r'[BAW]{1}'
 t_LBRACE = r'\{'
 t_RBRACE = r'\}'
 t_COMMA = r','
-
+t_ASPATH = r'\d{1,10}(\s+\d{1,10})*'
 
 
 # IP Y PREFIX
