@@ -26,15 +26,12 @@ t_TABLE_DUMP2 = r'TABLE_DUMP2'
 t_PIPE = r'\|'
 t_STATE = r'[BAW]{1}'
 t_ignore = ' \t'
-
 #t_ASPATH = r'\d{1,10}(\s+\d{1,10})*'
 
 # IP Y PREFIX
 #Cada octeto va de 0 225 y son 4 octetos los que llevan una IP
 # Una ip esta conformada por 4 octetos separados por puntos, esto se hace aca
-
-OCTET = r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
-
+OCTET = r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?![0-9])'
 IP_REGEX = (
     OCTET + r'\.' +
     OCTET + r'\.' +
@@ -42,8 +39,8 @@ IP_REGEX = (
     OCTET
 )
 
-# La mascara puede ir de 1 a 33 y se separa con / del IP
-MASK = r'(?:3[0-1]|[12][0-9]|[0-9])'
+# La mascara puede ir de 1 a 31 y se separa con / del IP
+MASK = r'(?:3[0-2]|[12][0-9]|[1-9])(?![1-9])'
 PREFIX_REGEX = IP_REGEX + r'/' + MASK
 
 # PREFIJO
