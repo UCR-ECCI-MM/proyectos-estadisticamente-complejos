@@ -4,6 +4,7 @@
 
 import os
 import glob
+from collections import Counter
 import ply.lex as lex
 
 
@@ -123,9 +124,15 @@ if not archivos:
 
 # PROCESAR TODOS LOS CHUNKS
 
+print("=" * 60)
+print("ANALISIS LEXICO INICIADO")
+print("=" * 60)
+print()
+
 print(f"Chunks encontrados: {len(archivos)}")
 print()
 
+resumen_global = Counter()
 
 for ruta in archivos:
 
@@ -135,6 +142,8 @@ for ruta in archivos:
 
     total_tokens = 0
     total_lineas = 0
+
+    resumen_chunk = Counter()
 
 
     # ========================================================
@@ -148,6 +157,13 @@ for ruta in archivos:
     ruta_salida = os.path.join(
         carpeta_salida,
         nombre_salida
+    )
+
+    nombre_errores = f"errores_{nombre_archivo}"
+
+    ruta_errores = os.path.join(
+        carpeta_salida,
+        nombre_errores
     )
 
     # ========================================================
@@ -190,6 +206,8 @@ for ruta in archivos:
 
                 total_tokens += 1
 
+                resumen_chunk[token.type] += 1
+
 
                 # =============================================
                 # GUARDAR SOLO EL VALOR DEL TOKEN
@@ -198,6 +216,24 @@ for ruta in archivos:
                 salida.write(
                     f"{token.value}\n"
                 )
+
+    resumen_global.update(resumen_chunk)
+
+    # ========================================================
+    # GUARDAR ERRORES EN ARCHIVO
+    # ========================================================
+
+    if errores:
+
+        with open(
+            ruta_errores,
+            "w",
+            encoding="utf-8"
+        ) as archivo_errores:
+
+            for error in errores:
+
+                archivo_errores.write(f"{error}\n")
 
     # ========================================================
     # RESULTADOS EN CONSOLA
@@ -221,16 +257,16 @@ for ruta in archivos:
 
         print("Errores encontrados:")
 
-        for error in errores[:10]:
+        for error in errores[:4]:
 
             print("  ", error)
 
 
-        if len(errores) > 10:
+        if len(errores) > 4:
 
             print(
                 f"  ... y "
-                f"{len(errores) - 10} "
+                f"{len(errores) - 4} "
                 f"errores adicionales."
             )
 
@@ -243,6 +279,13 @@ for ruta in archivos:
         f"\nArchivo generado: "
         f"{ruta_salida}"
     )
+
+    if errores:
+
+        print(
+            f"Archivo de errores: "
+            f"{ruta_errores}"
+        )
 
     print()
 
@@ -258,3 +301,10 @@ print(
     f"Resultados guardados en:\n"
     f"{carpeta_salida}"
 )
+
+print()
+print("Resumen global de tokens:")
+
+for tipo, cantidad in sorted(resumen_global.items()):
+
+    print(f"  {tipo}: {cantidad}")
