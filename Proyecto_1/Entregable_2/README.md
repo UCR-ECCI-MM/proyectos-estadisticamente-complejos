@@ -93,15 +93,15 @@ tokens = (
 
 Cada token representa un elemento diferente presente en los registros MRT.
 
-| Token         | Descripción                                      | Ejemplo          |   |
-| ------------- | ------------------------------------------------ | ---------------- | - |
-| `TABLE_DUMP2` | Identificador del tipo de registro               | `TABLE_DUMP2`    |   |
-| `STATE`       | Estado del registro BGP                          | `B`, `A` o `W`   |   |
-| `IP`          | Dirección IPv4                                   | `186.211.128.34` |   |
-| `PREFIX`      | Dirección IPv4 acompañada de longitud de prefijo | `82.255.64.0/19` |   |
-| `NUMBER`      | Valor numérico presente en el registro           | `14840`          |   |
-| `PIPE`        | Separador de campos                              | `                | ` |
-| `NEWLINE`     | Salto de línea                                   | `\n`             |   |
+| Token         | Descripción                                      | Ejemplo          |   
+| ------------- | ------------------------------------------------ | ---------------- | 
+| `TABLE_DUMP2` | Identificador del tipo de registro               | `TABLE_DUMP2`    |  
+| `STATE`       | Estado del registro BGP                          | `B`, `A` o `W`   |  
+| `IP`          | Dirección IPv4                                   | `186.211.128.34` |  
+| `PREFIX`      | Dirección IPv4 acompañada de longitud de prefijo | `82.255.64.0/19` |   
+| `NUMBER`      | Valor numérico presente en el registro           | `14840`          |   
+| `PIPE`        | Separador de campos                              | `                | ` 
+| `NEWLINE`     | Salto de línea                                   | `\n`             |   
 
 ---
 
