@@ -35,7 +35,6 @@ La distribución realizada fue la siguiente:
 | State                | Sebas      |       |
 | Fragmento de IP      | Alison     |       |
 | Dígito               | Brandon    |       |
-| Línea vertical (`    | `)         | Sebas |
 | Salto de línea       | Alison     |       |
 | Longitud del prefijo | Sebas      |       |
 
