@@ -9,7 +9,6 @@ import ply.lex as lex
 
 # TOKENS
 
-
 tokens = (
     'TABLE_DUMP2',
     'STATE',
@@ -17,31 +16,23 @@ tokens = (
     'PREFIX',
     'NUMBER',
     'PIPE',
-    'LBRACE',
-    'RBRACE',
-    'COMMA'
+    'NEWLINE'
 )
 
-
-
-# TOKENS SIMPLES
-
+# EXPRESIONES REGULARES
 
 t_TABLE_DUMP2 = r'TABLE_DUMP2'
 t_PIPE = r'\|'
 t_STATE = r'[BAW]{1}'
-t_LBRACE = r'\{'
-t_RBRACE = r'\}'
-t_COMMA = r','
-t_ASPATH = r'\d{1,10}(\s+\d{1,10})*'
+t_ignore = ' \t'
 
+#t_ASPATH = r'\d{1,10}(\s+\d{1,10})*'
 
 # IP Y PREFIX
 #Cada octeto va de 0 225 y son 4 octetos los que llevan una IP
-
+# Una ip esta conformada por 4 octetos separados por puntos, esto se hace aca
 
 OCTET = r'(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
-# Una ip esta conformada por 4 octetos separados por puntos, esto se hace aca
 
 IP_REGEX = (
     OCTET + r'\.' +
@@ -50,100 +41,70 @@ IP_REGEX = (
     OCTET
 )
 
-# La mascara puede ir de 0 a 32 y se separa con / del IP
-MASK = r'(?:3[0-2]|[12][0-9]|[0-9])'
-
+# La mascara puede ir de 1 a 33 y se separa con / del IP
+MASK = r'(?:3[0-1]|[12][0-9]|[0-9])'
 PREFIX_REGEX = IP_REGEX + r'/' + MASK
 
-
-
-# TOKEN PREFIX
-
-#  IP + / + longitud de máscara = PREFIX
+# PREFIJO
+#  IP + / + longitud de mascara = PREFIX
 @lex.TOKEN(PREFIX_REGEX)
 def t_PREFIX(t):
     return t
 
-
-
-# TOKEN IP
-
-
+# PEER IP
 @lex.TOKEN(IP_REGEX)
 def t_IP(t):
     return t
 
-
-
 # TOKEN NUMBER
-
 
 def t_NUMBER(t):
     r'\d+'
     t.value = int(t.value)
+
+    if t.value > 4294967295:
+        print(
+            f"Error de lexer en linea {t.lineno}: "
+            f"Fuera de rango (max 4294967295): {t.value}"
+        )
+        return None
+
     return t
 
-
-
-# ESPACIOS
-
-
-t_ignore = ' \t'
-
-
-
 # SALTOS DE LINEA
-
-
-def t_newline(t):
+def t_NEWLINE(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
-
-
+    return t
 
 # ERRORES LEXICOS
 
-
 errores = []
-
-
 def t_error(t):
-
     errores.append(
-        f"Línea {t.lexer.lineno}: "
-        f"carácter no reconocido '{t.value[0]}'"
+        f"Linea {t.lexer.lineno}: "
+        f"caracter no reconocido '{t.value[0]}'"
     )
-
     t.lexer.skip(1)
 
 
-
 # CREAR LEXER
-
-
 lexer = lex.lex()
-
-
 
 # CARPETAS
 
-
-carpeta_chunks = (
-    r"C:\Users\loboa\OneDrive\Desktop\Maestria"
-    r"\Computabilidad_Complejidad\dumps_correctos\Chunks"
-)
+# Ruta relativa a la ubicacion de este script, no al usuario/PC actual,
+# para que funcione igual en la maquina de cualquier integrante del equipo.
+carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+carpeta_chunks = os.path.join(carpeta_proyecto, "Datos", "Chunks")
 
 carpeta_salida = os.path.join(
     carpeta_chunks,
     "resultados_lexer"
 )
-
 os.makedirs(carpeta_salida, exist_ok=True)
 
-
-
 # BUSCAR TODOS LOS CHUNKS
-
 
 archivos = sorted(
     glob.glob(
@@ -160,10 +121,7 @@ if not archivos:
 
     raise SystemExit
 
-
-
 # PROCESAR TODOS LOS CHUNKS
-
 
 print(f"Chunks encontrados: {len(archivos)}")
 print()
@@ -191,7 +149,6 @@ for ruta in archivos:
         carpeta_salida,
         nombre_salida
     )
-
 
     # ========================================================
     # LEER ARCHIVO
@@ -242,7 +199,6 @@ for ruta in archivos:
                     f"{token.value}\n"
                 )
 
-
     # ========================================================
     # RESULTADOS EN CONSOLA
     # ========================================================
@@ -251,12 +207,11 @@ for ruta in archivos:
 
     print(f"Archivo: {nombre_archivo}")
 
-    print(f"Líneas analizadas: {total_lineas}")
+    print(f"Lineas analizadas: {total_lineas}")
 
     print(f"Tokens reconocidos: {total_tokens}")
 
-    print(f"Errores léxicos: {len(errores)}")
-
+    print(f"Errores lexicos: {len(errores)}")
 
     # ========================================================
     # MOSTRAR ERRORES
@@ -281,7 +236,7 @@ for ruta in archivos:
 
     else:
 
-        print("No se encontraron errores léxicos.")
+        print("No se encontraron errores lexicos.")
 
 
     print(
@@ -291,14 +246,11 @@ for ruta in archivos:
 
     print()
 
-
-
 # MENSAJE FINAL
-
 
 print("=" * 60)
 
-print("ANÁLISIS LÉXICO FINALIZADO")
+print("ANALISIS LEXICO FINALIZADO")
 
 print("=" * 60)
 
