@@ -36,7 +36,8 @@ La distribución realizada fue la siguiente:
 | Fragmento de IP      | Alison     |       
 | Dígito               | Brandon    |       
 | Salto de línea       | Alison     |       
-| Longitud del prefijo | Sebas      |       
+| Longitud del prefijo | Sebas      |  
+| Pipe | Brandon    |  
 
 Después de integrar las diferentes partes desarrolladas por el equipo, se construyó el lexer utilizado para procesar los archivos completos.
 
