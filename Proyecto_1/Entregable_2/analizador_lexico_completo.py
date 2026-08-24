@@ -40,7 +40,7 @@ IP_REGEX = (
 )
 
 # La mascara puede ir de 1 a 31 y se separa con / del IP
-MASK = r'(?:3[0-2]|[12][0-9]|[1-9])(?![1-9])'
+MASK = r'(?:3[0-1]|[12][0-9]|[1-9])(?![0-9])'
 PREFIX_REGEX = IP_REGEX + r'/' + MASK
 
 # PREFIJO
