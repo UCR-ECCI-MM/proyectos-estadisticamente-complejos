@@ -26,7 +26,7 @@ tokens = (
 t_TABLE_DUMP2 = r'TABLE_DUMP2'
 t_PIPE = r'\|'
 t_STATE = r'[BAW]{1}'
-t_ignore = ' \t('
+t_ignore = ' \t(),{}'
 
 # IP Y PREFIX
 #Cada octeto va de 0 225 y son 4 octetos los que llevan una IP
