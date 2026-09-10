@@ -66,7 +66,7 @@ def valida_bits(num):
 # TOKEN TIMESTAMP
 
 def t_TIMESTAMP(t):
-    r'\d{10}(?![0-9])'
+    r'\d{10}'
     t.value = int(t.value)
 
     valida_bits(t.value)
@@ -76,7 +76,7 @@ def t_TIMESTAMP(t):
 # TOKEN AS_NUMBER
 
 def t_AS_NUMBER(t):
-    r'\d{1,10}(?![0-9])'
+    r'\d{1,10}'
     t.value = int(t.value)
 
     valida_bits(t.value)
