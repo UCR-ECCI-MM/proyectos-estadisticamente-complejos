@@ -100,6 +100,36 @@ def t_error(t):
 # CREAR LEXER
 lexer = lex.lex()
 
+# GRAMATICA DEL PARSER
+
+def p_ruta_bgp(p):
+    'linea : TABLE_DUMP2 PIPE TIMESTAMP PIPE STATE PIPE IP PIPE AS_NUMBER PIPE PREFIX PIPE as_path'
+    p[0] = True
+
+def p_as_path(p):
+    '''as_path : AS_NUMBER lista_as
+                | TIMESTAMP lista_as'''
+
+def p_listas_as(p):
+    '''lista_as : AS_NUMBER lista_as
+                | TIMESTAMP lista_as
+                | '''
+
+errores_sintacticos = []
+
+def p_error(p):
+    if p:
+        errores_sintacticos.append(
+            f"Linea {p.lineno}: no esperaba '{p.value}'"
+        )
+    else:
+        errores_sintacticos.append(
+            "La entrada termino antes de tiempo"
+        )
+
+# CREAR PARSER
+parser = yacc.yacc()
+
 # CARPETAS
 
 # Ruta relativa a la ubicacion de este script, no al usuario/PC actual,
@@ -124,9 +154,10 @@ if not archivos:
 
     raise SystemExit
 
-# PROCESAR TODOS LOS CHUNKS
+# PROCESAR TODOS LOS CHUNKS: LEXER + PARSER SOBRE CADA LINEA
 
-todos_los_tokens = []
+total_lineas = 0
+lineas_ok = 0
 
 try:
 
@@ -134,7 +165,7 @@ try:
 
         errores.clear()
 
-        lexer.lineno = 1
+        errores_sintacticos.clear()
 
         with open(
             ruta,
@@ -147,20 +178,16 @@ try:
                 start=1
             ):
 
+                total_lineas += 1
+
                 lexer.lineno = numero_linea
 
                 linea_actual = linea
 
-                lexer.input(linea)
+                resultado = parser.parse(linea, lexer=lexer)
 
-                while True:
-
-                    token = lexer.token()
-
-                    if token is None:
-                        break
-
-                    todos_los_tokens.append(token)
+                if resultado:
+                    lineas_ok += 1
 
 except Exception as e:
 
@@ -169,59 +196,4 @@ except Exception as e:
     raise SystemExit
 
 print(f"Archivos leidos con exito: {len(archivos)}")
-
-
-# PARSER
-
-def p_ruta_bgp(p):
-    'linea : TABLE_DUMP2 PIPE TIMESTAMP PIPE STATE PIPE IP PIPE AS_NUMBER PIPE PREFIX PIPE as_path'
-    print("OK: linea reconocida")
-def p_as_path(p):
-    '''as_path : AS_NUMBER lista_as 
-                | TIMESTAMP lista_as'''
-
-def p_listas_as(p):
-    '''lista_as : AS_NUMBER lista_as 
-                | TIMESTAMP lista_as 
-                | '''
-
-def p_error(p):
-    if p:
-        print("Error sintactico, linea %d: no esperaba %r" % (p.lineno, p.value))
-    else:
-        print("Error sintactico: la entrada termino antes de tiempo")
-
-import ply.yacc as yacc
-
-def procesar_archivos():
-
-    carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    carpeta_chunks = os.path.join(carpeta_proyecto, "Datos", "Chunks")
-
-    archivos = sorted(glob.glob(os.path.join(carpeta_chunks, "chunk_*.txt")))
-
-    if not archivos:
-        print("No se encontraron archivos chunk_*.txt")
-        return
-
-    # ... el resto del bloque, ya indentado ...
-
-    print(f"Archivos leidos con exito: {len(archivos)}")
-parser = yacc.yacc()
-parser = yacc.yacc()
-
-pruebas = [
-    "TABLE_DUMP2|1785888000|B|200.40.162.202|6057|0.0.0.0/0|6057 12956",
-    "TABLE_DUMP2|1785888000|B|177.221.140.2|270014|0.0.0.0/0|270014",
-    "TABLE_DUMP2|1785888000|B|200.40.162.202|6057|0.0.0.0/0",
-    "TABLE_DUMP2|1785888000|X|200.40.162.202|6057|0.0.0.0/0|6057",
-    "TABLE_DUMP2|1785888000|B|200.40.162.202|0.0.0.0/0|6057|6057",
-]
-
-for texto in pruebas:
-    print("\n>>>", texto)
-    lexer.lineno = 1
-    parser.parse(texto, lexer=lexer)
-
-linea = "TABLE_DUMP2|1785888000|B|200.40.162.202|6057|0.0.0.0/0|6057 12956"
-parser.parse(linea, lexer=lexer)
+print(f"Lineas parseadas correctamente: {lineas_ok}/{total_lineas}")
