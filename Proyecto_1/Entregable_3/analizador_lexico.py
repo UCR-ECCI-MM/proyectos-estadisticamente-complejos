@@ -25,7 +25,7 @@ tokens = (
 t_TABLE_DUMP2 = r'TABLE_DUMP2'
 t_PIPE = r'\|'
 t_STATE = r'[BAW]{1}'
-t_ignore = ' \t(),{}'
+t_ignore = ' \t\n(),{}'
 
 # IP Y PREFIX
 #Cada octeto va de 0 225 y son 4 octetos los que llevan una IP
@@ -118,13 +118,17 @@ def p_listas_as(p):
 errores_sintacticos = []
 
 def p_error(p):
+    contenido = linea_actual.rstrip(chr(10))
+
     if p:
         errores_sintacticos.append(
-            f"Linea {p.lineno}: no esperaba '{p.value}'"
+            f"Linea {p.lineno}: no esperaba '{p.value}' "
+            f"| Contenido: {contenido}"
         )
     else:
         errores_sintacticos.append(
-            "La entrada termino antes de tiempo"
+            f"Linea {lexer.lineno}: la entrada termino antes de tiempo "
+            f"| Contenido: {contenido}"
         )
 
 # CREAR PARSER
@@ -163,10 +167,6 @@ try:
 
     for ruta in archivos:
 
-        errores.clear()
-
-        errores_sintacticos.clear()
-
         with open(
             ruta,
             "r",
@@ -197,3 +197,19 @@ except Exception as e:
 
 print(f"Archivos leidos con exito: {len(archivos)}")
 print(f"Lineas parseadas correctamente: {lineas_ok}/{total_lineas}")
+
+if errores:
+
+    print(f"\nErrores lexicos ({len(errores)}):")
+
+    for error in errores:
+
+        print("  ", error)
+
+if errores_sintacticos:
+
+    print(f"\nErrores sintacticos ({len(errores_sintacticos)}):")
+
+    for error in errores_sintacticos:
+
+        print("  ", error)
