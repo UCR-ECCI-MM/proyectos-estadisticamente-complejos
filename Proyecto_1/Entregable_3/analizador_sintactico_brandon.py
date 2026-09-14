@@ -4,8 +4,8 @@
 
 import os
 import glob
-from collections import Counter
 import ply.lex as lex
+import ply.yacc as yacc
 
 
 # TOKENS
@@ -17,8 +17,7 @@ tokens = (
     'IP',
     'PREFIX',
     'AS_NUMBER',
-    'PIPE',
-    'NEWLINE'
+    'PIPE'
 )
 
 # EXPRESIONES REGULARES
@@ -54,7 +53,7 @@ def t_PREFIX(t):
 def t_IP(t):
     return t
 
-# Funcion que valida rango de tokens NUMBER y TIMESTAMP 
+# Funcion que valida rango de tokens NUMBER y TIMESTAMP
 
 def valida_bits(num):
     if num > 4294967295:
@@ -84,12 +83,6 @@ def t_AS_NUMBER(t):
 
     return t
 
-# SALTOS DE LINEA
-def t_NEWLINE(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
-    return t
-
 # ERRORES LEXICOS
 
 errores = []
@@ -107,18 +100,42 @@ def t_error(t):
 # CREAR LEXER
 lexer = lex.lex()
 
+# GRAMATICA DEL PARSER
+
+def p_ruta_bgp(p):
+    'linea : TABLE_DUMP2 PIPE TIMESTAMP PIPE STATE PIPE IP PIPE AS_NUMBER PIPE PREFIX PIPE as_path'
+    p[0] = True
+
+def p_as_path(p):
+    '''as_path : AS_NUMBER lista_as
+                | TIMESTAMP lista_as'''
+
+def p_listas_as(p):
+    '''lista_as : AS_NUMBER lista_as
+                | TIMESTAMP lista_as
+                | '''
+
+errores_sintacticos = []
+
+def p_error(p):
+    if p:
+        errores_sintacticos.append(
+            f"Linea {p.lineno}: no esperaba '{p.value}'"
+        )
+    else:
+        errores_sintacticos.append(
+            "La entrada termino antes de tiempo"
+        )
+
+# CREAR PARSER
+parser = yacc.yacc()
+
 # CARPETAS
 
 # Ruta relativa a la ubicacion de este script, no al usuario/PC actual,
 # para que funcione igual en la maquina de cualquier integrante del equipo.
 carpeta_proyecto = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 carpeta_chunks = os.path.join(carpeta_proyecto, "Datos", "Chunks")
-
-carpeta_salida = os.path.join(
-    carpeta_chunks,
-    "resultados_lexer"
-)
-os.makedirs(carpeta_salida, exist_ok=True)
 
 # BUSCAR TODOS LOS CHUNKS
 
@@ -137,165 +154,46 @@ if not archivos:
 
     raise SystemExit
 
-# PROCESAR TODOS LOS CHUNKS
+# PROCESAR TODOS LOS CHUNKS: LEXER + PARSER SOBRE CADA LINEA
 
-print("=" * 60)
-print("ANALISIS LEXICO INICIADO")
-print("=" * 60)
-print()
+total_lineas = 0
+lineas_ok = 0
 
-print(f"Chunks encontrados: {len(archivos)}")
-print()
+try:
 
-resumen_global = Counter()
+    for ruta in archivos:
 
-for ruta in archivos:
+        errores.clear()
 
-    errores.clear()
-
-    lexer.lineno = 1
-
-    total_tokens = 0
-    total_lineas = 0
-
-    resumen_chunk = Counter()
-
-
-    # ========================================================
-    # NOMBRES DE ARCHIVOS
-    # ========================================================
-
-    nombre_archivo = os.path.basename(ruta)
-
-    nombre_salida = f"tokens_{nombre_archivo}"
-
-    ruta_salida = os.path.join(
-        carpeta_salida,
-        nombre_salida
-    )
-
-    nombre_errores = f"errores_{nombre_archivo}"
-
-    ruta_errores = os.path.join(
-        carpeta_salida,
-        nombre_errores
-    )
-
-    # ========================================================
-    # LEER ARCHIVO
-    # ========================================================
-
-    with open(
-        ruta,
-        "r",
-        encoding="utf-8"
-    ) as archivo, open(
-        ruta_salida,
-        "w",
-        encoding="utf-8"
-    ) as salida:
-
-
-        for numero_linea, linea in enumerate(
-            archivo,
-            start=1
-        ):
-
-            total_lineas += 1
-
-            lexer.lineno = numero_linea
-
-            linea_actual = linea
-
-            lexer.input(linea)
-
-
-            # =================================================
-            # OBTENER TOKENS
-            # =================================================
-
-            while True:
-
-                token = lexer.token()
-
-                if token is None:
-                    break
-
-                total_tokens += 1
-
-                resumen_chunk[token.type] += 1
-
-
-                # =============================================
-                # GUARDAR SOLO EL VALOR DEL TOKEN
-                # =============================================
-
-                salida.write(
-                    f"{token.value}\n"
-                )
-
-    resumen_global.update(resumen_chunk)
-
-    # ========================================================
-    # GUARDAR ERRORES EN ARCHIVO
-    # ========================================================
-
-    if errores:
+        errores_sintacticos.clear()
 
         with open(
-            ruta_errores,
-            "w",
+            ruta,
+            "r",
             encoding="utf-8"
-        ) as archivo_errores:
+        ) as archivo:
 
-            for error in errores:
+            for numero_linea, linea in enumerate(
+                archivo,
+                start=1
+            ):
 
-                archivo_errores.write(f"{error}\n")
+                total_lineas += 1
 
-    # ========================================================
-    # RESULTADOS EN CONSOLA
-    # ========================================================
+                lexer.lineno = numero_linea
 
-    print("=" * 60)
+                linea_actual = linea
 
-    print(f"Archivo: {nombre_archivo}")
+                resultado = parser.parse(linea, lexer=lexer)
 
-    print(f"Lineas analizadas: {total_lineas}")
+                if resultado:
+                    lineas_ok += 1
 
-    print(f"Tokens reconocidos: {total_tokens}")
+except Exception as e:
 
-    print(f"Errores lexicos: {len(errores)}")
+    print(f"Error leyendo archivos de entrada: {e}")
 
-    print(
-        f"\nArchivo generado: "
-        f"{ruta_salida}"
-    )
+    raise SystemExit
 
-    if errores:
-
-        print(
-            f"Archivo de errores: "
-            f"{ruta_errores}"
-        )
-
-    print()
-
-# MENSAJE FINAL
-
-print("=" * 60)
-
-print("ANALISIS LEXICO FINALIZADO")
-
-print("=" * 60)
-
-print(
-    f"Resultados guardados en:\n"
-    f"{carpeta_salida}"
-)
-
-print()
-print("Resumen global de tokens:")
-
-for tipo, cantidad in sorted(resumen_global.items()):
-
-    print(f"  {tipo}: {cantidad}")
+print(f"Archivos leidos con exito: {len(archivos)}")
+print(f"Lineas parseadas correctamente: {lineas_ok}/{total_lineas}")
