@@ -333,6 +333,39 @@ print(
 #=========== FUNCIONALIDAD 2
 
 print(
-    f"Sistemas autonomos distintos: "
+    f"\nPeer AS distintos: "
     f"{len(datos_por_as)}"
 )
+
+print(
+    f"Peer AS encontrados: "
+    f"{list(datos_por_as.keys())}"
+)
+
+# TOP 5 AS con mayor cantidad de rutas
+top_as = sorted(
+    datos_por_as.items(),
+    key=lambda item: sum(
+        len(rutas)
+        for rutas in item[1].values()
+    ),
+    reverse=True
+)[:5]
+
+print("\nTOP 5 Peer AS con mas rutas:")
+
+for peer_as, peer_ips in top_as:
+
+    cantidad_aristas = len(peer_ips)
+
+    cantidad_rutas = sum(
+        len(rutas)
+        for rutas in peer_ips.values()
+    )
+
+    print(
+        f"AS {peer_as}: "
+        f"{cantidad_aristas} aristas, "
+        f"{cantidad_rutas} rutas"
+    )
+
