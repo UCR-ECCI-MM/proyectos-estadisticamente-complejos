@@ -130,8 +130,11 @@ lexer = lex.lex()
 
 def p_ruta_bgp(p):
     'linea : TABLE_DUMP2 PIPE TIMESTAMP PIPE STATE PIPE IP PIPE AS_NUMBER PIPE PREFIX PIPE as_path'
-    p[0]= {'prefijo': p[11], 
-           'as_path': p[13]}
+    p[0]= {        
+        'peer_ip': p[7],
+        'peer_as': p[9],
+        'prefijo': p[11], 
+        'as_path': p[13]}
 
 def p_as_path(p):
     '''as_path : as_path AS_NUMBER
@@ -175,6 +178,30 @@ def funcionalidad_1(prefijo, as_path):
         if as_path[-1] not in funcionalidad_1_datos[prefijo]:
           funcionalidad_1_datos[prefijo].append(as_path[-1])
 
+
+#================================================ FUNCIONALIDAD 2 ====================================================
+
+datos_por_as = {}
+
+def funcionalidad_2(peer_as, peer_ip, prefijo, as_path):
+
+    # Si el AS no existe, se crea.
+    if peer_as not in datos_por_as:
+        datos_por_as[peer_as] = {}
+
+    # Si la arista (Peer IP) no existe para ese AS,
+    # se crea con una lista vacia.
+    if peer_ip not in datos_por_as[peer_as]:
+        datos_por_as[peer_as][peer_ip] = []
+
+    # Se almacena el prefijo junto con su AS Path.
+    datos_por_as[peer_as][peer_ip].append(
+        {
+            "prefijo": prefijo,
+            "as_path": as_path
+        }
+    )
+
 #==================================== PROCESAR LINEAS: LEXER + PARSER SOBRE CADA LINEA ====================================
 
 total_lineas = 0
@@ -206,9 +233,17 @@ try:
                 if resultado:
                     lineas_ok += 1
 
-                    # FUNCIONALIDAD 1
-                    funcionalidad_1(resultado.get('prefijo'), resultado.get('as_path'))
+                    prefijo = resultado.get('prefijo')
+                    as_path = resultado.get('as_path')
+                    peer_as = resultado.get('peer_as')
+                    peer_ip = resultado.get('peer_ip')
 
+                    # FUNCIONALIDAD 1
+                    funcionalidad_1(prefijo, as_path)
+
+                    # FUNCIONALIDAD 2
+                    funcionalidad_2(peer_as, peer_ip, prefijo, as_path)
+     
 except Exception as e:
 
     print(f"Error leyendo archivos de entrada: {e}")
@@ -237,7 +272,59 @@ if errores_sintacticos:
 #======================================= MOSTRAR OUTPUTS ===========================
 
 #=========== FUNCIONLIDAD 1
-
+ 
 print(f"Prefijos distintos: {len(funcionalidad_1_datos)}")
 
-#=========== 
+moas = {p: o for p, o in funcionalidad_1_datos.items() if len(o) > 1}
+unicos = {p: o for p, o in funcionalidad_1_datos.items() if len(o) == 1}
+print(f"Prefijos con mas de un origen: {len(moas)}\n")
+
+muestras = sorted(moas.items())[:7] + sorted(unicos.items())[:7]
+ancho = max(len(p) for p, _ in muestras)
+
+print(f"{'PREFIJO':<{ancho}}  {'#':>2}  ORIGENES")
+print("-" * (ancho + 30))
+
+for prefijo, origenes in muestras:
+    lista = ", ".join(str(o) for o in sorted(origenes))
+    print(f"{prefijo:<{ancho}}  {len(origenes):>2}  {lista}")
+
+
+#=========== FUNCIONALIDAD 2
+
+print(
+    f"\nPeer AS distintos: "
+    f"{len(datos_por_as)}"
+)
+
+print(
+    f"Peer AS encontrados: "
+    f"{list(datos_por_as.keys())}"
+)
+
+# TOP 5 AS con mayor cantidad de rutas
+top_as = sorted(
+    datos_por_as.items(),
+    key=lambda item: sum(
+        len(rutas)
+        for rutas in item[1].values()
+    ),
+    reverse=True
+)[:5]
+
+print("\nTOP 5 Peer AS con mas rutas:")
+
+for peer_as, peer_ips in top_as:
+
+    cantidad_aristas = len(peer_ips)
+
+    cantidad_rutas = sum(
+        len(rutas)
+        for rutas in peer_ips.values()
+    )
+
+    print(
+        f"AS {peer_as}: "
+        f"{cantidad_aristas} aristas, "
+        f"{cantidad_rutas} rutas"
+    )
