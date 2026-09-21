@@ -363,10 +363,9 @@ print(
 
 )
 
-print(
+print("\nEjemplo de estructuras creadas:")
 
-    f"Prefijos con estructuras creadas: "
+for prefijo, datos in list(datos_funcionalidad_3.items())[:2]:
 
-    f"{list(datos_funcionalidad_3.keys())[:10]}"
-
-)
+    print(f"\nPrefijo: {prefijo}")
+    print(datos)
