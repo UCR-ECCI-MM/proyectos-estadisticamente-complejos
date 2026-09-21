@@ -1,4 +1,3 @@
-
 # IMPORTAR BIBLOTECAS
 
 import os
@@ -202,6 +201,28 @@ def funcionalidad_2(peer_as, peer_ip, prefijo, as_path):
         }
     )
 
+#================================================ FUNCIONALIDAD 3 ====================================================
+
+datos_funcionalidad_3 = {}
+
+def funcionalidad_3(prefijo, peer_as, as_path):
+
+    # Si el prefijo no existe, se crea.
+
+    if prefijo not in datos_funcionalidad_3:
+
+        datos_funcionalidad_3[prefijo] = {}
+
+    # Si el Peer AS no existe para ese prefijo, se crea.
+
+    if peer_as not in datos_funcionalidad_3[prefijo]:
+
+        datos_funcionalidad_3[prefijo][peer_as] = []
+
+    # Se almacena el AS Path asociado.
+
+    datos_funcionalidad_3[prefijo][peer_as].append(as_path)
+
 #==================================== PROCESAR LINEAS: LEXER + PARSER SOBRE CADA LINEA ====================================
 
 total_lineas = 0
@@ -243,6 +264,9 @@ try:
 
                     # FUNCIONALIDAD 2
                     funcionalidad_2(peer_as, peer_ip, prefijo, as_path)
+
+                    # FUNCIONALIDAD 3
+                    funcionalidad_3(prefijo, peer_as, as_path)
      
 except Exception as e:
 
@@ -271,7 +295,7 @@ if errores_sintacticos:
 
 #======================================= MOSTRAR OUTPUTS ===========================
 
-#=========== FUNCIONLIDAD 1
+#=========== FUNCIONALIDAD 1
  
 print(f"Prefijos distintos: {len(funcionalidad_1_datos)}")
 
@@ -328,3 +352,20 @@ for peer_as, peer_ips in top_as:
         f"{cantidad_aristas} aristas, "
         f"{cantidad_rutas} rutas"
     )
+
+#=========== FUNCIONALIDAD 3
+
+print(
+
+    f"\nPrefijos distintos en funcionalidad 3: "
+
+    f"{len(datos_funcionalidad_3)}"
+
+)
+
+print("\nEjemplo de estructuras creadas:")
+
+for prefijo, datos in list(datos_funcionalidad_3.items())[:2]:
+
+    print(f"\nPrefijo: {prefijo}")
+    print(datos)
