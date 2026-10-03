@@ -62,6 +62,15 @@ def consultar_funcionalidad_1_2(datos_func_1):
 
     return prefijo
 
+def consultar_funcionalidad_2(datos_func_2):
+
+    print("  Todavia no esta implementada.")
+
+
+def consultar_funcionalidad_3(datos_func_3):
+
+    print("  Todavia no esta implementada.")
+
 
 #====================================================== MENU PRINCIPAL ======================================================
 
@@ -100,6 +109,8 @@ def submenu_funcionalidad_1(datos_func_1):
 def mostrar_menu():
     print("\n==================== MENU ====================")
     print("1. Funcionalidad 1")
+    print("2. Funcionalidad 2")
+    print("3. Funcionalidad 3")
     print("0. Salir")
     print("===============================================")
 
@@ -107,8 +118,7 @@ def mostrar_menu():
 def main():
     print("Cargando y procesando los chunks, esto puede tardar...")
 
-    # Las funcionalidades 2 y 3 todavia no se colocan en este menu.
-    datos_func_1, _, _ = cargar_datos()
+    datos_func_1, datos_func_2, datos_func_3 = cargar_datos()
 
     print("\nDatos cargados con exito.")
 
@@ -120,6 +130,14 @@ def main():
 
         if opcion == "1":
             submenu_funcionalidad_1(datos_func_1)
+
+        elif opcion == "2":
+            consultar_funcionalidad_2(datos_func_2)
+            pausar()
+
+        elif opcion == "3":
+            consultar_funcionalidad_3(datos_func_3)
+            pausar()
 
         elif opcion == "0":
             print("Saliendo...")
