@@ -64,9 +64,11 @@ def consultar_funcionalidad_1_2(datos_func_1):
 
 def consultar_funcionalidad_2(datos_func_2):
     """
-    Solicita un numero de AS y muestra todas sus aristas (Peer IP).
-    Para cada arista, muestra los prefijos conocidos y el AS Path
-    asociado a cada prefijo.
+    Solicita un numero de AS y muestra:
+    - La cantidad total de aristas del AS.
+    - Las aristas encontradas (Peer IP).
+    - Para cada arista, los prefijos conocidos.
+    - El AS Path asociado a cada prefijo.
     """
 
     # Solicitar el numero de AS al usuario
@@ -75,8 +77,9 @@ def consultar_funcionalidad_2(datos_func_2):
     # Validar que el AS ingresado sea numerico
     try:
         peer_as = int(entrada)
+
     except ValueError:
-        print("  El numero de AS debe ser un valor numerico.")
+        print("El numero de AS debe ser un valor numerico.")
         return
 
     # Buscar el AS en la estructura de datos
@@ -84,33 +87,57 @@ def consultar_funcionalidad_2(datos_func_2):
 
     # Verificar si existen datos para ese AS
     if not peer_ips:
-        print(f"\n  No hay datos para el AS {peer_as}.")
+        print(f"\nNo hay datos para el AS {peer_as}.")
         return
 
-    print(f"\n--- Aristas y rutas conocidas por el AS {peer_as} ---")
+    # Encabezado
+    print("\n================ FUNCIONALIDAD 2 ================")
 
-    # Recorrer todas las aristas (Peer IP) del AS
+    # Mostrar el AS consultado
+    print(f"\nAS consultado: {peer_as}")
+
+    # Mostrar la cantidad de aristas
+    print(f"Total de aristas: {len(peer_ips)}")
+
+    # Mostrar todas las aristas encontradas
+    print("\nAristas encontradas:")
+
+    for indice, peer_ip in enumerate(sorted(peer_ips.keys()), start=1):
+        print(f"  {indice}. {peer_ip}")
+
+    # Pausa antes de mostrar todas las rutas
+    input("\nPresiona ENTER para mostrar los prefijos y AS Paths...")
+
+    # Recorrer cada arista
     for peer_ip, rutas in sorted(peer_ips.items()):
 
-        print(f"\nArista (Peer IP): {peer_ip}")
-        print("-" * 80)
-        print(f"{'PREFIJO':<20} AS PATH")
+        print("\n" + "-" * 80)
+        print(f"ARISTA (Peer IP): {peer_ip}")
         print("-" * 80)
 
-        # Recorrer todas las rutas conocidas a traves de la arista
+        # Encabezados de la tabla
+        print(f"{'PREFIJO':<25} AS PATH")
+        print("-" * 80)
+
+        # Recorrer las rutas conocidas a traves de esta arista
         for ruta in rutas:
 
+            # Obtener el prefijo
             prefijo = ruta["prefijo"]
+
+            # Obtener el AS Path
             as_path = ruta["as_path"]
 
             # Convertir la lista del AS Path a un formato legible
             as_path_formateado = formatear_as_path(as_path)
 
-            print(f"{prefijo:<20} {as_path_formateado}")
+            # Mostrar el prefijo y su AS Path
+            print(f"{prefijo:<25} {as_path_formateado}")
 
-        print(f"\nTotal de prefijos por esta arista: {len(rutas)}")
+        # Mostrar la cantidad de rutas de esta arista
+        print(f"\nTotal de rutas por esta arista: {len(rutas)}")
 
-    print(f"\nTotal de aristas del AS {peer_as}: {len(peer_ips)}")
+    print("\n=================================================")
 
 
 def consultar_funcionalidad_3(datos_func_3):
