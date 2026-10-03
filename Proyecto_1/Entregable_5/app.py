@@ -63,8 +63,54 @@ def consultar_funcionalidad_1_2(datos_func_1):
     return prefijo
 
 def consultar_funcionalidad_2(datos_func_2):
+    """
+    Solicita un numero de AS y muestra todas sus aristas (Peer IP).
+    Para cada arista, muestra los prefijos conocidos y el AS Path
+    asociado a cada prefijo.
+    """
 
-    print("  Todavia no esta implementada.")
+    # Solicitar el numero de AS al usuario
+    entrada = input("Numero de AS: ").strip()
+
+    # Validar que el AS ingresado sea numerico
+    try:
+        peer_as = int(entrada)
+    except ValueError:
+        print("  El numero de AS debe ser un valor numerico.")
+        return
+
+    # Buscar el AS en la estructura de datos
+    peer_ips = datos_func_2.get(peer_as)
+
+    # Verificar si existen datos para ese AS
+    if not peer_ips:
+        print(f"\n  No hay datos para el AS {peer_as}.")
+        return
+
+    print(f"\n--- Aristas y rutas conocidas por el AS {peer_as} ---")
+
+    # Recorrer todas las aristas (Peer IP) del AS
+    for peer_ip, rutas in sorted(peer_ips.items()):
+
+        print(f"\nArista (Peer IP): {peer_ip}")
+        print("-" * 80)
+        print(f"{'PREFIJO':<20} AS PATH")
+        print("-" * 80)
+
+        # Recorrer todas las rutas conocidas a traves de la arista
+        for ruta in rutas:
+
+            prefijo = ruta["prefijo"]
+            as_path = ruta["as_path"]
+
+            # Convertir la lista del AS Path a un formato legible
+            as_path_formateado = formatear_as_path(as_path)
+
+            print(f"{prefijo:<20} {as_path_formateado}")
+
+        print(f"\nTotal de prefijos por esta arista: {len(rutas)}")
+
+    print(f"\nTotal de aristas del AS {peer_as}: {len(peer_ips)}")
 
 
 def consultar_funcionalidad_3(datos_func_3):
