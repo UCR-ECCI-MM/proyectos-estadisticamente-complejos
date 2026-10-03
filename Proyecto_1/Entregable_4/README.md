@@ -62,16 +62,6 @@ Cada línea del dump tiene siete campos separados por `|`:
 TABLE_DUMP2|1785888000|B|177.101.16.80|53046|7.0.0.0/8|53046 61626 14840 3356 749
 ```
 
-| # | Campo | Validación |
-|---|-------|-----------|
-| 1 | Record type | Debe ser `TABLE_DUMP2` |
-| 2 | Timestamp | Número de 10 dígitos, máximo 4294967295 |
-| 3 | State | `B`, `A` o `W` |
-| 4 | Peer IP | Dirección IPv4 (cada octeto de 0 a 255) |
-| 5 | Peer AS | Número, máximo 4294967295 |
-| 6 | Destination prefix | IPv4 + `/` + máscara de 0 a 32 |
-| 7 | AS Path | Lista de uno o más identificadores de AS |
-
 ## Qué hace el programa
 
 1. **Lee** todos los archivos `chunk_*.txt`.
