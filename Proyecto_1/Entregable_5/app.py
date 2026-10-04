@@ -9,6 +9,18 @@ def formatear_as_path(as_path):
 
     return " -> ".join(str(as_num) for as_num in as_path)
 
+def obtener_segmento_ruta(as_path, as_origenes):
+    """Busca dentro de un AS Path alguno de los AS de origen del prefijo A.
+    Si encuentra uno, devuelve el segmento del AS Path desde ese AS
+    hasta el AS de origen del prefijo B.
+    """
+
+    for indice, as_num in enumerate(as_path):
+
+        if as_num in as_origenes:
+            return as_path[indice:]
+
+    return None
 
 def pausar():
     """Detiene la ejecucion hasta que el usuario presione ENTER."""
@@ -139,10 +151,102 @@ def consultar_funcionalidad_2(datos_func_2):
 
     print("\n=================================================")
 
+def consultar_funcionalidad_3(datos_func_1, datos_func_3):
+    """
+    Dados dos prefijos A y B, muestra todas las rutas disponibles
+    entre ellos utilizando los AS Paths almacenados durante el parseo.
 
-def consultar_funcionalidad_3(datos_func_3):
+    datos_func_1:
+        Permite obtener los AS de origen asociados a cada prefijo.
 
-    print("  Todavia no esta implementada.")
+    datos_func_3:
+        Permite acceder directamente a los AS Paths conocidos para
+        un prefijo, agrupados por Peer AS.
+    """
+
+    print("\n================ FUNCIONALIDAD 3 ================")
+
+    # 1. Solicitar los dos prefijos
+
+    prefijo_a = input("Prefijo A (ej 1.2.3.0/24): ").strip()
+    prefijo_b = input("Prefijo B (ej 1.2.3.0/24): ").strip()
+
+    # 2. Obtener AS de origen usando funcionalidad 1
+
+    origenes_a = datos_func_1.get(prefijo_a)
+    origenes_b = datos_func_1.get(prefijo_b)
+
+    if not origenes_a:
+        print(f"\nNo hay datos para el prefijo A: {prefijo_a}")
+        return
+
+    if not origenes_b:
+        print(f"\nNo hay datos para el prefijo B: {prefijo_b}")
+        return
+
+    print(f"\nPrefijo A: {prefijo_a}")
+    print(f"AS de origen: {sorted(origenes_a)}")
+
+    print(f"\nPrefijo B: {prefijo_b}")
+    print(f"AS de origen: {sorted(origenes_b)}")
+
+    # 3. Buscar directamente las rutas hacia B
+
+    rutas_hacia_b = datos_func_3.get(prefijo_b)
+
+    if not rutas_hacia_b:
+        print(f"\nNo existen rutas conocidas hacia {prefijo_b}.")
+        return
+
+    rutas_encontradas = []
+
+    # 4. Revisar los AS Paths de B
+
+    for peer_as, as_paths in rutas_hacia_b.items():
+
+        for as_path in as_paths:
+
+            segmento = obtener_segmento_ruta(
+                as_path,
+                origenes_a
+            )
+
+            if segmento is not None:
+
+                # Verificar que la ruta realmente termine en un AS que origina el prefijo B.
+                if segmento[-1] in origenes_b:
+
+                    # Evitar mostrar exactamente la misma ruta más de una vez.
+                    if segmento not in rutas_encontradas:
+                        rutas_encontradas.append(segmento)
+
+    # 5. Mostrar resultados
+
+    print("\n" + "-" * 80)
+    print("RUTAS DISPONIBLES")
+    print("-" * 80)
+
+    if not rutas_encontradas:
+
+        print(
+            f"No se encontraron rutas entre "
+            f"{prefijo_a} y {prefijo_b}."
+        )
+
+        return
+
+    for indice, ruta in enumerate(rutas_encontradas, start=1):
+
+        print(
+            f"{indice}. "
+            f"{prefijo_a} -> "
+            f"{formatear_as_path(ruta)} -> "
+            f"{prefijo_b}"
+        )
+
+    print(f"\nTotal de rutas encontradas: {len(rutas_encontradas)}")
+
+    print("\n=================================================")    
 
 
 #====================================================== MENU PRINCIPAL ======================================================
@@ -209,7 +313,7 @@ def main():
             pausar()
 
         elif opcion == "3":
-            consultar_funcionalidad_3(datos_func_3)
+            consultar_funcionalidad_3(datos_func_1, datos_func_3)
             pausar()
 
         elif opcion == "0":
