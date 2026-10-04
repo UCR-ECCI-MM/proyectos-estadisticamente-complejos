@@ -9,19 +9,6 @@ def formatear_as_path(as_path):
 
     return " -> ".join(str(as_num) for as_num in as_path)
 
-def obtener_segmento_ruta(as_path, as_origenes):
-    """Busca dentro de un AS Path alguno de los AS de origen del prefijo A.
-    Si encuentra uno, devuelve el segmento del AS Path desde ese AS
-    hasta el AS de origen del prefijo B.
-    """
-
-    for indice, as_num in enumerate(as_path):
-
-        if as_num in as_origenes:
-            return as_path[indice:]
-
-    return None
-
 def pausar():
     """Detiene la ejecucion hasta que el usuario presione ENTER."""
 
@@ -206,19 +193,25 @@ def consultar_funcionalidad_3(datos_func_1, datos_func_3):
 
         for as_path in as_paths:
 
-            segmento = obtener_segmento_ruta(
-                as_path,
-                origenes_a
+            # Verificar que alguno de los AS de origen del prefijo A
+            # aparezca en cualquier posicion del AS Path
+            contiene_origen_a = any(
+                as_origen in as_path
+                for as_origen in origenes_a
             )
 
-            if segmento is not None:
+            # Verificar que el AS Path termine en uno de los
+            # AS de origen del prefijo B
+            termina_en_origen_b = (
+                as_path[-1] in origenes_b
+            )
 
-                # Verificar que la ruta realmente termine en un AS que origina el prefijo B.
-                if segmento[-1] in origenes_b:
+            # Si cumple ambas condiciones, se conserva
+            # el AS Path COMPLETO
+            if contiene_origen_a and termina_en_origen_b:
 
-                    # Evitar mostrar exactamente la misma ruta más de una vez.
-                    if segmento not in rutas_encontradas:
-                        rutas_encontradas.append(segmento)
+                if as_path not in rutas_encontradas:
+                    rutas_encontradas.append(as_path)
 
     # 5. Mostrar resultados
 
