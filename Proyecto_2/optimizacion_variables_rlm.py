@@ -15,8 +15,11 @@ X = datos.drop(columns="critical_temp").to_numpy()
 y = datos["critical_temp"].to_numpy()
 n, total_variables = X.shape
 
+# 2. Guarda la mejor solucion de cada tecnica
+resultados = {}
 
-# 2. ESTADISTICAS DEL DATASET 
+
+# 3. ESTADISTICAS DEL DATASET
 
 if __name__ == "__main__":
     print(f"Observaciones: {n} | Variables predictoras: {total_variables}")
@@ -24,7 +27,7 @@ if __name__ == "__main__":
     print(datos["critical_temp"].describe().round(2))
 
 
-# 3. 
+# 4. FUNCION OBJETIVO
 
 def r2_ajustado(vector):
     """
@@ -33,8 +36,9 @@ def r2_ajustado(vector):
     Fuerza bruta, stepwise y el algoritmo genetico la usan para evaluar
     los modelos que generan.
 
-    vector: lista o arreglo de 81 valores, uno por variable predictora,
+    vector: lista de 81 valores, uno por variable predictora,
     en el orden de las columnas del CSV.
+    
         1 = la variable entra al modelo
         0 = la variable no entra al modelo
 
