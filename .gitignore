@@ -1,0 +1,5 @@
+# Entorno virtual local (cada quien lo crea con requirements.txt)
+.venv/
+
+# Configuracion local del editor
+.vscode/
