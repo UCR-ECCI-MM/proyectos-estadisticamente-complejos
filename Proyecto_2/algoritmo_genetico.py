@@ -4,6 +4,7 @@ Metaheuristica: algoritmo genetico para seleccion de variables en RLM.
 import time
 
 import numpy as np
+import pandas as pd
 
 from datos_r2 import nombres_variables, r2_ajustado, total_variables
 
@@ -37,7 +38,7 @@ class AlgoritmoGenetico:
     def poblacion_inicial(self):
         # vectores aleatorios, sin repetidos y sin filas en cero
         poblacion = np.empty((0, total_variables), dtype=int)
-
+ 
         while len(poblacion) < self.no_poblacion:
             faltan = self.no_poblacion - len(poblacion)
             nuevos = np.random.randint(0, 2, size=(faltan, total_variables))
@@ -191,3 +192,23 @@ def correr_algoritmo_genetico(matriz_parametros, semilla=42):
         salida.append("Ganador!" if parametros == ganador else "")
 
     return resultados_genetico
+
+
+PARAMETROS = ["no_poblacion", "porc_progenitores", "no_generaciones", "prob_mutacion",
+              "prob_cruce", "paciencia", "tolerancia", "elitismo", "tam_torneo"]
+
+
+def tabla_genetico(resultados_genetico):
+    # dos tablas: los parametros de cada config y lo que dio cada una
+    nombres = [f"config {i}" for i in range(1, len(resultados_genetico) + 1)]
+
+    tabla_param = pd.DataFrame(list(resultados_genetico.keys()), columns=PARAMETROS, index=nombres)
+
+    tabla_res = pd.DataFrame(
+        [s[:5] + [s[6]] for s in resultados_genetico.values()],
+        columns=["modelos_evaluados", "generaciones", "tiempo_s",
+                 "generacion_mejor", "r2_ajustado", "ganador"],
+        index=nombres,
+    ).round({"tiempo_s": 2, "r2_ajustado": 5})
+
+    return f"Parametros:\n{tabla_param.to_string()}\n\nResultados:\n{tabla_res.to_string()}"
