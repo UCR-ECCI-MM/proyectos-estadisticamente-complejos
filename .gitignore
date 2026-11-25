@@ -3,3 +3,6 @@
 
 # Configuracion local del editor
 .vscode/
+
+# Archivos temporales de Python
+__pycache__/

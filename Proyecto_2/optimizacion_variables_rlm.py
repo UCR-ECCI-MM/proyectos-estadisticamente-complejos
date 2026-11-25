@@ -14,6 +14,7 @@ Estructura:
 import pandas as pd
 
 from algoritmo_genetico import correr_algoritmo_genetico
+from fuerza_bruta import mejor_resultado_guardado
 
 # DATOS FINALES
 resultados = {}
@@ -49,5 +50,11 @@ if __name__ == "__main__":
     # HEURISTICA: STEPWISE
 
     # FUERZA BRUTA
+
+    # Se lee el mejor resultado de los experimentos ya guardados en
+    # resultados_fuerza_bruta/corridas_fuerza_bruta.csv (para generarlos
+    # de nuevo: python fuerza_bruta.py). Es el optimo exacto sobre las
+    # primeras k variables, con el mayor k que se completo.
+    resultados["fuerza_bruta"] = mejor_resultado_guardado()
 
     # RESULTADOS FINALES

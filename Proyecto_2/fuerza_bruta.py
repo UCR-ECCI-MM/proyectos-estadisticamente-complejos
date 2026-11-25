@@ -132,6 +132,45 @@ def correr_experimentos(plan, ruta_csv, limite_seg=None):
                       f"vars={r['num_variables']}", flush=True)
 
 
+RUTA_CSV = Path(__file__).resolve().parent / "resultados_fuerza_bruta" / "corridas_fuerza_bruta.csv"
+
+
+def mejor_resultado_guardado(ruta_csv=RUTA_CSV):
+    """
+    Lee el CSV de experimentos y retorna la mejor solucion de la fuerza
+    bruta con el formato acordado por el grupo.
+
+    Se usa el CSV para no tener que repetir corridas de varios minutos
+    cada vez que se ejecuta el script principal.
+
+    Criterios:
+      - Solo cuentan las corridas completas: una corrida cortada por el
+        limite de tiempo no garantiza haber encontrado el optimo.
+      - Se elige la de mayor R2 ajustado (corresponde al mayor k completado).
+      - tiempo_seg es el PROMEDIO de las repeticiones de ese k, que es
+        mas confiable que una sola medicion.
+    """
+    with open(ruta_csv, newline="") as archivo:
+        corridas = [fila for fila in csv.DictReader(archivo)
+                    if fila["completada"] == "True"]
+
+    mejor = max(corridas, key=lambda fila: float(fila["mejor_r2_ajustado"]))
+
+    # Todas las repeticiones del mismo k, para promediar el tiempo
+    mismas_k = [fila for fila in corridas if fila["k"] == mejor["k"]]
+    tiempo_promedio = sum(float(f["tiempo_seg"]) for f in mismas_k) / len(mismas_k)
+
+    variables = mejor["variables"].split(";")
+
+    return {
+        "r2_ajustado": float(mejor["mejor_r2_ajustado"]),
+        "variables": variables,
+        "num_variables": len(variables),
+        "tiempo_seg": tiempo_promedio,
+        "modelos_evaluados": int(mejor["modelos_evaluados"]),
+    }
+
+
 if __name__ == "__main__":
     # Plan de experimentos:
     #   - k de 1 a 12: corridas cortas, 5 repeticiones cada una
@@ -142,7 +181,5 @@ if __name__ == "__main__":
             + [(k, 3) for k in range(13, 17)]
             + [(18, 1)])
 
-    ruta = Path(__file__).resolve().parent / "resultados_fuerza_bruta" / "corridas_fuerza_bruta.csv"
-
     # Limite de 30 minutos por corrida para que ninguna se quede colgada
-    correr_experimentos(plan, ruta, limite_seg=30 * 60)
+    correr_experimentos(plan, RUTA_CSV, limite_seg=30 * 60)
