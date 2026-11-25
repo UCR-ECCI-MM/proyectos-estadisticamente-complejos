@@ -1,0 +1,14 @@
+VALIDACION CON k = 18
+  Modelos evaluados antes del limite: 228482 de 262143 (87.2%)
+  Tiempo completo estimado por ritmo: 34.4 min
+  Tiempo que predice el ajuste:       35.5 min
+  Diferencia: +3.3%
+
+AJUSTE EXPONENCIAL
+  log2(tiempo) = -9.042 + 1.117 * k   (con k = 8 a 16)
+  Cada variable extra multiplica el tiempo por 2.17
+
+EXTRAPOLACION A LAS 81 VARIABLES (2.418e+24 modelos)
+  Metodo 1 (recta del ajuste):          3.211e+24 s = 1.02e+17 anios
+  Metodo 2 (modelos x 33.2 ms/modelo): 8.037e+22 s = 2.55e+15 anios
+  Comparacion: 1.85e+05 veces la edad del universo (metodo 2)

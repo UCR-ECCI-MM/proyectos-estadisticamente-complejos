@@ -10,7 +10,9 @@ Idea:
 Como con las 81 variables del dataset es imposible (2^81 - 1 modelos),
 se trabaja con las primeras k variables y se mide como crece el tiempo.
 """
+import csv
 import time
+from pathlib import Path
 
 import numpy as np
 
@@ -83,7 +85,64 @@ def fuerza_bruta(k, limite_seg=None):
     }
 
 
+def correr_experimentos(plan, ruta_csv, limite_seg=None):
+    """
+    Corre la fuerza bruta para varios tamanos de k y guarda cada corrida
+    como una fila del CSV.
+
+    plan: lista de pares (k, repeticiones). Ejemplo: [(5, 3), (10, 2)]
+        corre k = 5 tres veces y k = 10 dos veces.
+    ruta_csv: archivo donde se guardan las corridas. Se crea de nuevo
+        cada vez que se llama a esta funcion.
+    limite_seg: limite de tiempo por corrida (ver fuerza_bruta).
+
+    Cada fila se escribe apenas termina su corrida, asi que si el
+    experimento se interrumpe no se pierde lo que ya se corrio.
+    """
+    columnas = ["k", "repeticion", "modelos_evaluados", "tiempo_seg",
+                "mejor_r2_ajustado", "num_variables", "variables", "completada"]
+
+    ruta_csv = Path(ruta_csv)
+    ruta_csv.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(ruta_csv, "w", newline="") as archivo:
+        escritor = csv.writer(archivo)
+        escritor.writerow(columnas)
+
+        for k, repeticiones in plan:
+            for repeticion in range(1, repeticiones + 1):
+                r = fuerza_bruta(k, limite_seg)
+
+                escritor.writerow([
+                    k,
+                    repeticion,
+                    r["modelos_evaluados"],
+                    r["tiempo_seg"],
+                    r["r2_ajustado"],
+                    r["num_variables"],
+                    ";".join(r["variables"]),   # nombres separados por ;
+                    r["completada"],
+                ])
+                archivo.flush()     # guarda la fila en disco de inmediato
+
+                print(f"k={k:2d}  rep={repeticion}  "
+                      f"modelos={r['modelos_evaluados']:>7}  "
+                      f"tiempo={r['tiempo_seg']:9.2f} s  "
+                      f"R2aj={r['r2_ajustado']:.5f}  "
+                      f"vars={r['num_variables']}", flush=True)
+
+
 if __name__ == "__main__":
-    # Prueba rapida con k pequeno
-    for k in (1, 2, 3, 8):
-        print(f"k = {k}:", fuerza_bruta(k))
+    # Plan de experimentos:
+    #   - k de 1 a 12: corridas cortas, 5 repeticiones cada una
+    #   - k de 13 a 16: corridas mas largas, 3 repeticiones cada una
+    #   - k = 18: una sola corrida, para comprobar despues si la
+    #     extrapolacion hecha con k <= 16 predice bien su tiempo
+    plan = ([(k, 5) for k in range(1, 13)]
+            + [(k, 3) for k in range(13, 17)]
+            + [(18, 1)])
+
+    ruta = Path(__file__).resolve().parent / "resultados_fuerza_bruta" / "corridas_fuerza_bruta.csv"
+
+    # Limite de 30 minutos por corrida para que ninguna se quede colgada
+    correr_experimentos(plan, ruta, limite_seg=30 * 60)
